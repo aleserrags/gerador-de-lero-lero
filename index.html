@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerador de Lero-Lero Universal</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            width: 100%;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+            font-weight: bold;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-style: italic;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #555;
+        }
+
+        select, button {
+            padding: 10px 20px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        select {
+            background: white;
+            cursor: pointer;
+        }
+
+        select:hover, select:focus {
+            border-color: #667eea;
+            outline: none;
+        }
+
+        .generate-btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            transform: translateY(0);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .generate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .generate-btn:active {
+            transform: translateY(0);
+        }
+
+        .result-container {
+            background: #f8f9fa;
+            border: 2px dashed #ddd;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 20px;
+            min-height: 150px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .result-container.has-content {
+            border: 2px solid #667eea;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        }
+
+        .lero-text {
+            font-size: 18px;
+            line-height: 1.6;
+            color: #333;
+            text-align: justify;
+            opacity: 0;
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        .placeholder {
+            color: #999;
+            font-style: italic;
+            text-align: center;
+        }
+
+        .copy-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .copy-btn:hover {
+            background: #218838;
+            transform: translateY(-2px);
+        }
+
+        .copy-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .footer {
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+            margin-top: 20px;
+        }
+
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .generating {
+            animation: pulse 1s infinite;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎭 Gerador de Lero-Lero</h1>
+        <p class="subtitle">O texto que parece importante mas não diz nada específico!</p>
+        
+        <div class="controls">
+            <div class="control-group">
+                <label for="tamanho">Tamanho:</label>
+                <select id="tamanho">
+                    <option value="curto">Curto</option>
+                    <option value="medio" selected>Médio</option>
+                    <option value="longo">Longo</option>
+                    <option value="mega">Mega Lero</option>
+                </select>
+            </div>
+            
+            <div class="control-group">
+                <label for="intensidade">Intensidade:</label>
+                <select id="intensidade">
+                    <option value="light">Leve</option>
+                    <option value="medium" selected>Normal</option>
+                    <option value="heavy">Pesado</option>
+                    <option value="extreme">Extremo</option>
+                </select>
+            </div>
+            
+            <button class="generate-btn" onclick="gerarLero()">
+                ✨ Gerar Lero-Lero
+            </button>
+        </div>
+        
+        <div class="result-container" id="resultado">
+            <div class="placeholder">
+                Clique no botão acima para gerar seu lero-lero personalizado! 🎯
+            </div>
+        </div>
+        
+        <button class="copy-btn" id="copyBtn" onclick="copiarTexto()" disabled>
+            📋 Copiar Texto
+        </button>
+        
+        <div class="footer">
+            💡 Dica: Use este texto em reuniões para soar intelectual sem comprometer-se com nada específico!
+        </div>
+    </div>
+
+    <script>
+        const inicios = [
+            "É fundamental compreender que",
+            "Através de uma análise profunda, percebemos que",
+            "No contexto atual da sociedade moderna,",
+            "Considerando os paradigmas contemporâneos,",
+            "A partir de uma perspectiva holística,",
+            "Levando em conta os fatores multidimensionais,",
+            "Na conjuntura presente, é evidente que",
+            "Sob a ótica da complexidade sistêmica,",
+            "Mediante uma abordagem interdisciplinar,",
+            "Em consonância com as tendências globais,",
+            "Diante da evolução dos processos,",
+            "No âmbito das transformações sociais,",
+            "Considerando a dinamicidade dos fenômenos,",
+            "A partir de uma visão estratégica,"
+        ];
+
+        const conectivos = [
+            "a sinergia entre os elementos",
+            "a convergência de fatores",
+            "a otimização dos recursos",
+            "a maximização do potencial",
+            "a integração sistêmica",
+            "a articulação das variáveis",
+            "o alinhamento estratégico",
+            "a coordenação eficaz",
+            "a harmonização dos processos",
+            "o aprimoramento contínuo",
+            "a consolidação das práticas",
+            "a potencialização das capacidades",
+            "a estruturação metodológica",
+            "a implementação eficiente"
+        ];
+
+        const objetos = [
+            "das competências organizacionais",
+            "dos recursos humanos especializados",
+            "das tecnologias emergentes",
+            "dos processos inovativos",
+            "das metodologias aplicadas",
+            "dos sistemas integrados",
+            "das práticas sustentáveis",
+            "dos indicadores de performance",
+            "das estruturas operacionais",
+            "dos mecanismos de controle",
+            "das diretrizes estratégicas",
+            "dos protocolos estabelecidos",
+            "das ferramentas disponíveis",
+            "dos procedimentos padronizados"
+        ];
+
+        const verbos = [
+            "proporciona",
+            "viabiliza",
+            "potencializa",
+            "facilita",
+            "otimiza",
+            "maximiza",
+            "garante",
+            "assegura",
+            "promove",
+            "estabelece",
+            "consolida",
+            "fortalece",
+            "aprimora",
+            "desenvolve"
+        ];
+
+        const resultados = [
+            "uma abordagem mais eficaz para os desafios contemporâneos",
+            "soluções inovadoras para questões complexas",
+            "a superação de obstáculos tradicionais",
+            "um diferencial competitivo sustentável",
+            "a melhoria contínua dos resultados",
+            "o alcance de objetivos estratégicos",
+            "a excelência operacional desejada",
+            "impactos positivos mensuráveis",
+            "a transformação digital necessária",
+            "vantagens competitivas significativas",
+            "outcomes superiores aos esperados",
+            "a evolução dos paradigmas existentes",
+            "benefícios tangíveis e intangíveis",
+            "resultados exponenciais e escaláveis"
+        ];
+
+        const complementos = [
+            "através de uma metodologia comprovada e testada",
+            "mediante a aplicação de best practices internacionais",
+            "por meio de frameworks consolidados no mercado",
+            "utilizando tecnologias de ponta e disruptivas",
+            "com base em dados científicos e empíricos",
+            "através de processos otimizados e eficientes",
+            "mediante abordagens customer-centric",
+            "por meio de estratégias data-driven",
+            "utilizando inteligência artificial e machine learning",
+            "com foco em user experience e design thinking",
+            "através de metodologias ágeis e flexíveis",
+            "mediante analytics avançado e insights profundos",
+            "por meio de automação inteligente e robotização",
+            "utilizando blockchain e tecnologias emergentes"
+        ];
+
+        const finalizadores = [
+            "garantindo assim a sustentabilidade e perenidade dos resultados alcançados.",
+            "assegurando a escalabilidade e replicabilidade em diferentes contextos.",
+            "promovendo uma cultura de inovação e melhoria contínua.",
+            "estabelecendo novos patamares de excelência e qualidade.",
+            "criando um ecossistema robusto e resiliente para o futuro.",
+            "desenvolvendo competências essenciais para a era digital.",
+            "construindo pontes sólidas entre teoria e prática aplicada.",
+            "fortalecendo os pilares fundamentais do crescimento sustentável.",
+            "otimizando recursos e maximizando o retorno sobre investimento.",
+            "transformando desafios em oportunidades de crescimento exponencial."
+        ];
+
+        const buzzwords = [
+            "sinergia", "paradigma", "disruptivo", "inovação", "transformação digital",
+            "machine learning", "big data", "analytics", "insights", "engagement",
+            "stakeholders", "compliance", "governance", "frameworks", "metodologias ágeis",
+            "design thinking", "customer journey", "user experience", "omnichannel",
+            "escalabilidade", "resiliência", "sustentabilidade", "benchmarking"
+        ];
+
+        function getRandomElement(arr) {
+            return arr[Math.floor(Math.random() * arr.length)];
+        }
+
+        function adicionarBuzzwords(texto, intensidade) {
+            const quantidade = {
+                light: 1,
+                medium: 2,
+                heavy: 3,
+                extreme: 4
+            }[intensidade] || 2;
+
+            for (let i = 0; i < quantidade; i++) {
+                const buzzword = getRandomElement(buzzwords);
+                const posicoes = [
+                    ` O conceito de ${buzzword} é fundamental neste processo.`,
+                    ` Através do ${buzzword}, alcançamos resultados excepcionais.`,
+                    ` A implementação de ${buzzword} revoluciona a abordagem tradicional.`,
+                    ` O ${buzzword} representa um diferencial competitivo essencial.`
+                ];
+                texto += getRandomElement(posicoes);
+            }
+
+            return texto;
+        }
+
+        function gerarFrase() {
+            const inicio = getRandomElement(inicios);
+            const conectivo = getRandomElement(conectivos);
+            const objeto = getRandomElement(objetos);
+            const verbo = getRandomElement(verbos);
+            const resultado = getRandomElement(resultados);
+            const complemento = getRandomElement(complementos);
+            
+            return `${inicio} ${conectivo} ${objeto} ${verbo} ${resultado} ${complemento}`;
+        }
+
+        function gerarLero() {
+            const tamanho = document.getElementById('tamanho').value;
+            const intensidade = document.getElementById('intensidade').value;
+            const resultado = document.getElementById('resultado');
+            const copyBtn = document.getElementById('copyBtn');
+            
+            // Adiciona animação de carregamento
+            resultado.innerHTML = '<div class="placeholder generating">Gerando lero-lero épico... 🤔</div>';
+            resultado.classList.remove('has-content');
+            copyBtn.disabled = true;
+
+            setTimeout(() => {
+                const quantidadeFrases = {
+                    curto: 2,
+                    medio: 4,
+                    longo: 6,
+                    mega: 8
+                }[tamanho] || 4;
+
+                let texto = '';
+                
+                for (let i = 0; i < quantidadeFrases; i++) {
+                    texto += gerarFrase() + '. ';
+                }
+
+                // Adiciona finalizador
+                texto += ' ' + getRandomElement(finalizadores);
+
+                // Adiciona buzzwords baseado na intensidade
+                texto = adicionarBuzzwords(texto, intensidade);
+
+                resultado.innerHTML = `<div class="lero-text">${texto}</div>`;
+                resultado.classList.add('has-content');
+                copyBtn.disabled = false;
+            }, 1000);
+        }
+
+        function copiarTexto() {
+            const texto = document.querySelector('.lero-text');
+            if (texto) {
+                navigator.clipboard.writeText(texto.textContent).then(() => {
+                    const copyBtn = document.getElementById('copyBtn');
+                    const originalText = copyBtn.textContent;
+                    copyBtn.textContent = '✅ Copiado!';
+                    copyBtn.style.background = '#28a745';
+                    
+                    setTimeout(() => {
+                        copyBtn.textContent = originalText;
+                        copyBtn.style.background = '#28a745';
+                    }, 2000);
+                });
+            }
+        }
+
+        // Gerar um lero-lero inicial
+        window.addEventListener('load', () => {
+            setTimeout(gerarLero, 500);
+        });
+    </script>
+</body>
+</html>
